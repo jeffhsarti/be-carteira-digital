@@ -1,0 +1,27 @@
+{
+  "name": "be-carteira-digital",
+  "version": "1.0.0",
+  "description": "Desafio técnico para desenvolvedores full stack proposto pelo Grupo Adiano Cobuccio",
+  "main": "src/index.ts",
+  "scripts": {
+    "test": "vitest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jeffhsarti/be-carteira-digital.git"
+  },
+  "author": "Jefferson Sarti",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jeffhsarti/be-carteira-digital/issues"
+  },
+  "homepage": "https://github.com/jeffhsarti/be-carteira-digital#readme",
+  "devDependencies": {
+    "@types/node": "^22.13.4",
+    "@typescript-eslint/eslint-plugin": "^8.24.1",
+    "@typescript-eslint/parser": "^8.24.1",
+    "eslint-config-prettier": "^10.0.1",
+    "eslint-plugin-prettier": "^5.2.3",
+    "typescript": "^5.7.3"
+  }
+}
