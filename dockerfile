@@ -2,16 +2,19 @@
 FROM node:18-alpine AS builder
 WORKDIR /app
 
-# Copia os arquivos de dependência da raiz do repositório
-COPY be-carteira-digital/package*.json ./
+# Copia os arquivos de dependência da raiz do projeto (package.json e package-lock.json, se existir)
+COPY package*.json ./
+
+# Copia o arquivo tsconfig.json
+COPY tsconfig.json ./
 
 # Instala as dependências, incluindo devDependencies (necessárias para build e testes)
 RUN npm install
 
 # Copia o código fonte da pasta "src"
-COPY be-carteira-digital/src ./src
+COPY src ./src
 
-# Executa o build do projeto (supondo que o script "build" compila o conteúdo de "src" para "dist")
+# Executa o build do projeto (assumindo que o script "build" compila os arquivos de "src" para "dist")
 RUN npm run build
 
 # Etapa de Produção

@@ -1,0 +1,12 @@
+global:
+  scrape_interval: 5s
+
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  - job_name: 'be-carteira-digital'
+    static_configs:
+      - targets: ['app:3000']  # Configura o Prometheus para coletar métricas da sua aplicação na porta 3000
+    metrics_path: '/metrics'  # Rota onde as métricas do Prometheus estão sendo expostas

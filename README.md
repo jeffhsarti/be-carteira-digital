@@ -59,7 +59,7 @@ Abaixo estão as funcionalidades de cada serviço de monitoramento:
 
 - Prometheus coleta métricas do backend e outros serviços configurados.
 - As métricas podem ser consultadas via `http://localhost:9090`.
-- O arquivo de configuração `monitoring/prometheus.yml` define as fontes de métricas.
+- O arquivo de configuração `monitoring/prometheus.yaml` define as fontes de métricas.
 
 ### **Grafana** (Painéis de Visualização)
 
