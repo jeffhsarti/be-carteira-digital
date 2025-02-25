@@ -29,6 +29,12 @@ Para iniciar todos os serviços necessários, execute o seguinte comando na raiz
 docker-compose up -d
 ```
 
+ou
+
+```sh
+docker compose up -d
+```
+
 Isso iniciará os containers de:
 - **Backend da carteira digital** (`app`)
 - **Banco de Dados PostgreSQL** (`db`)
@@ -41,6 +47,12 @@ Caso queira visualizar os logs dos serviços em tempo real:
 
 ```sh
 docker-compose logs -f
+```
+
+ou 
+
+```sh
+docker-compose logs <nome-da-imagem> -f
 ```
 
 Para derrubar os containers e limpar os volumes criados:
@@ -80,24 +92,29 @@ Abaixo estão as funcionalidades de cada serviço de monitoramento:
 
 ---
 
-## 🔌 Variáveis de Ambiente
+## Variáveis de Ambiente
 
-As variáveis de ambiente são configuradas diretamente no `docker-compose.yml`. Algumas importantes:
+As variáveis de ambiente são configuradas diretamente no `docker-compose.yaml`.
 
-```yaml
-environment:
-  - NODE_ENV=production
-  - PORT=3000
-  - DB_HOST=db
-  - DB_PORT=5432
-  - DB_USER=postgres
-  - DB_PASSWORD=postgres
-  - DB_NAME=carteira
-  - JAEGER_AGENT_HOST=jaeger
-  - JAEGER_AGENT_PORT=6831
+Caso precise alterar alguma variável, edite o `docker-compose.yaml` antes de iniciar os containers.
+
+Não utilize valores reais ao atualizar e _commitar_ o arquivo `docker-compose.yaml`. Utilize algum serviço de gerenciamento de chaves e secrets como o Azure Keyvault ou similar para valores de produção. 
+
+---
+
+## Testes
+
+Para executar os testes unitários e de integração, execute o comando:
+
+```sh
+npm run test
 ```
 
-Caso precise alterar alguma variável, edite o `docker-compose.yml` antes de iniciar os containers.
+Para o relatório de cobertura, execute o comando:
+
+```sh
+npm run test:coverage
+```
 
 ---
 

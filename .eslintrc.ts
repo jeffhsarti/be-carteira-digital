@@ -4,16 +4,18 @@ module.exports = {
     ecmaVersion: 2020, // Permite recursos modernos do ECMAScript
     sourceType: "module",
     project: "./tsconfig.json", // Necessário para regras que dependem do type-checking
+    tsconfigRootDir: ".",
   },
   env: {
     browser: true,
     node: true,
     es2021: true,
   },
-  plugins: ["@typescript-eslint", "prettier"],
+  plugins: ["@typescript-eslint", "prettier", "import"],
   extends: [
     "eslint:recommended",
     "plugin:@typescript-eslint/recommended", // Recomendações para TypeScript
+    "plugin:@typescript-eslint/recommended-requiring-type-checking",
     "plugin:prettier/recommended", // Habilita o eslint-plugin-prettier e exibe erros de formatação como erros do ESLint
     "prettier", // Deve ser sempre o último para desabilitar regras conflitantes com o Prettier
   ],

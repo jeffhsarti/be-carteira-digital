@@ -14,6 +14,7 @@ services:
       - DB_USER=postgres
       - DB_PASSWORD=postgres
       - DB_NAME=carteira
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/carteira?schema=public
       - JAEGER_AGENT_HOST=jaeger
       - JAEGER_AGENT_PORT=6831
     depends_on:

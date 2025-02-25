@@ -11,6 +11,12 @@ COPY tsconfig.json ./
 # Instala as dependências, incluindo devDependencies (necessárias para build e testes)
 RUN npm install
 
+# Copia a pasta do Prisma (schema e demais arquivos necessários)
+COPY prisma ./prisma
+
+# Gera o Prisma Client com base no schema
+RUN npx prisma generate
+
 # Copia o código fonte da pasta "src"
 COPY src ./src
 
