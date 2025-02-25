@@ -1,44 +1,110 @@
-import logger from "./util/logger";
 import "./util/tracing";
-import express from "express";
-import cors from "cors";
 import figlet from "figlet";
-import promBundle from "express-prom-bundle";
-import promClient from "prom-client";
+import ExpressApp from "./frameworks/express";
+import ServicesFactory from "./core/services/factory";
+import {
+  ExpressControllersFactory,
+  ExpressMiddlewaresFactory,
+} from "./frameworks/express/modules/client";
+import { clientRepository, walletRepository } from "./infra/repositories";
 
-const metricsMiddleware = promBundle({
-  includeMethod: true,
-  includePath: true,
-  includeStatusCode: true,
-  promClient: {
-    collectDefaultMetrics: {}, // Coletar métricas padrão do Prometheus, como memória e CPU
+const app = new ExpressApp();
+
+const servicesFactory = new ServicesFactory(clientRepository, walletRepository);
+const expressControllersFactory = new ExpressControllersFactory(
+  servicesFactory,
+);
+const expressMiddlewaresFactory = new ExpressMiddlewaresFactory();
+
+const clientAdapters = expressControllersFactory.createClientController();
+const walletAdapters = expressControllersFactory.createWalletController();
+
+app.registerControllers([
+  // Client Routes
+  {
+    method: "get",
+    path: "clients",
+    beforeMiddlewares: [],
+    handler: clientAdapters.getAllClients,
+    afterMiddlewares: [],
   },
+  {
+    method: "get",
+    path: "clients/:clientId",
+    beforeMiddlewares: [
+      expressMiddlewaresFactory.createClientIdParamValidationMiddleware()
+        .execute,
+    ],
+    handler: clientAdapters.getClientById,
+    afterMiddlewares: [],
+  },
+  {
+    method: "get",
+    path: "clients/:clientId/wallets",
+    beforeMiddlewares: [
+      expressMiddlewaresFactory.createClientIdParamValidationMiddleware()
+        .execute,
+    ],
+    handler: walletAdapters.getWalletsOfClient,
+    afterMiddlewares: [],
+  },
+  {
+    method: "get",
+    path: "clients/:clientId/wallets/info",
+    beforeMiddlewares: [
+      expressMiddlewaresFactory.createClientIdParamValidationMiddleware()
+        .execute,
+    ],
+    handler: walletAdapters.getAllWalletsInfoOfClient,
+    afterMiddlewares: [],
+  },
+  {
+    method: "post",
+    path: "clients",
+    beforeMiddlewares: [
+      expressMiddlewaresFactory.createClientBodyValidationMiddleware().execute,
+    ],
+    handler: clientAdapters.createClient,
+    afterMiddlewares: [],
+  },
+  // Wallet Routes
+  {
+    method: "get",
+    path: "wallets/:walletId",
+    beforeMiddlewares: [
+      expressMiddlewaresFactory.createWalletIdParamValidationMiddleware()
+        .execute,
+    ],
+    handler: walletAdapters.getWalletById,
+    afterMiddlewares: [],
+  },
+  {
+    method: "get",
+    path: "wallets/:walletId/info",
+    beforeMiddlewares: [
+      expressMiddlewaresFactory.createWalletIdParamValidationMiddleware()
+        .execute,
+    ],
+    handler: walletAdapters.getWalletInfoById,
+    afterMiddlewares: [],
+  },
+  {
+    method: "post",
+    path: "wallets",
+    beforeMiddlewares: [
+      expressMiddlewaresFactory.createWalletBodyValidationMiddleware().execute,
+    ],
+    handler: walletAdapters.createWallet,
+    afterMiddlewares: [],
+  },
+]);
+
+figlet("Carteira Digital", (err, data) => {
+  if (err) {
+    console.log("Carteira Digital");
+    return;
+  }
+  console.log(data);
 });
 
-const app = express();
-app.use(cors());
-app.use(express.json());
-
-app.use(metricsMiddleware);
-
-app.get("/", (req, res) => {
-  res.json({ message: "API Carteira Digital" });
-});
-
-app.get("/metrics", async (req, res) => {
-  res.set("Content-Type", promClient.register.contentType); // Definir o tipo de conteúdo
-  const content = await promClient.register.metrics();
-  res.end(content); // Expor as métricas coletadas
-});
-
-app.listen(3000, () => {
-  logger.info("API iniciada na porta 3000!");
-
-  figlet("Carteira Digital", (err, data) => {
-    if (err) {
-      console.log("Carteira Digital");
-      return;
-    }
-    console.log(data);
-  });
-});
+app.start();

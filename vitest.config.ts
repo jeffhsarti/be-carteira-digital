@@ -1,6 +1,10 @@
 import { defineConfig } from "vite";
-import tsconfigPaths from "vite-tsconfig-paths";
 
-export default defineConfig({
-  plugins: [tsconfigPaths()],
+export default defineConfig(async () => {
+  // Importa o plugin de forma dinâmica, garantindo que seja carregado como ESM
+  const tsconfigPaths = (await import("vite-tsconfig-paths")).default;
+
+  return {
+    plugins: [tsconfigPaths()],
+  };
 });
