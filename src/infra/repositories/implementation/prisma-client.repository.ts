@@ -1,5 +1,6 @@
 import { Client } from "../../../core/entities/client.entity";
-import { IClient } from "../../../core/interfaces/client.interface";
+import { IPartialClient } from "../../../core/interfaces/client.interface";
+import ClientMapper from "../../../frameworks/prisma/mappers/client.mapper";
 import IClientModel from "../../../frameworks/prisma/models/client.model";
 import { IClientRepository } from "../client.repository";
 
@@ -8,16 +9,22 @@ export default class PrismaClientRepository implements IClientRepository {
   async getById(id: string): Promise<Client | null> {
     const data = await this.clientModel.findById(id);
     if (!data) return null;
-    return new Client(data as IClient);
+    return ClientMapper.mapToClientEntity(data);
+  }
+
+  async getByEmail(email: string): Promise<IPartialClient | null> {
+    const data = await this.clientModel.findByEmail(email);
+    if (!data) return null;
+    return ClientMapper.mapToPartialClient(data);
   }
 
   async getAll(): Promise<Client[]> {
     const data = await this.clientModel.findAll();
-    return data.map((item) => new Client(item as IClient));
+    return data.map((client) => ClientMapper.mapToClientEntity(client));
   }
 
   async create(client: Client): Promise<Client> {
     const data = await this.clientModel.create(client);
-    return new Client(data as IClient);
+    return ClientMapper.mapToClientEntity(data);
   }
 }

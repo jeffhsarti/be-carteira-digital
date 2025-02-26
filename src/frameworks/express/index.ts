@@ -4,9 +4,9 @@ import helmet from "helmet";
 
 import promClient from "prom-client";
 
-import { ControllerAdapter } from "./types";
 import logger from "../../util/logger";
 import { expressMetricsClient } from "./modules/middlewares/metrics.middleware";
+import { ControllerAdapter } from "./types";
 
 export default class ExpressApp {
   app: express.Application;

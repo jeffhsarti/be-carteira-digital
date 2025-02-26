@@ -1,5 +1,4 @@
 import { Wallet } from "@prisma/client";
-import { Decimal } from "@prisma/client/runtime/library";
 import { Wallet as WalletEntity } from "../../../core/entities/wallet.entity";
 import {
   ISanitizedWallet,

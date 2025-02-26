@@ -1,7 +1,9 @@
+import IAuthService from "../auth.service";
 import IClientService from "../client.service";
+import AuthService from "../implementation/auth.service";
 import ClientService from "../implementation/client.service";
-import IWalletService from "../wallet.service";
 import WalletService from "../implementation/wallet.service";
+import IWalletService from "../wallet.service";
 
 import { IClientRepository } from "../../../infra/repositories/client.repository";
 import { IWalletRepository } from "../../../infra/repositories/wallet.repository";
@@ -18,5 +20,9 @@ export default class ServiceFactory {
 
   createWalletService(): IWalletService {
     return new WalletService(this.walletRepository);
+  }
+
+  createAuthService(): IAuthService {
+    return new AuthService(this.createClientService());
   }
 }

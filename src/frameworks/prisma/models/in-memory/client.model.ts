@@ -19,6 +19,12 @@ export default class InMemoryClientModel implements IClientModel {
     return client ? { ...client } : null;
   }
 
+  async findByEmail(email: string): Promise<Client | null> {
+    const client = this.clients.find((client) => client.email === email);
+    // Retorna uma cópia para simular o comportamento de uma query
+    return client ? { ...client } : null;
+  }
+
   async findAll(): Promise<Client[]> {
     // Retorna uma cópia do array
     return [...this.clients];

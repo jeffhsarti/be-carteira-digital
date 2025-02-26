@@ -2,6 +2,7 @@ import { Client } from "../../../core/entities/client.entity";
 import {
   IBaseClient,
   IClient,
+  IPartialClient,
   ISanitizedClient,
 } from "../../../core/interfaces/client.interface";
 import ClientSanitizer from "../../../core/mappers/client-sanitizer";
@@ -13,8 +14,8 @@ import {
   ClientAlreadyExistsException,
   ClientNotFoundException,
 } from "../../../core/errors/client.errors";
-import { UniqueConstraintError } from "../../../util/exception";
 import { hashPassword } from "../../../util/crypto";
+import { UniqueConstraintError } from "../../../util/exception";
 
 export default class ClientService implements IClientService {
   constructor(
@@ -47,8 +48,13 @@ export default class ClientService implements IClientService {
       if (error instanceof UniqueConstraintError) {
         throw new ClientAlreadyExistsException(rawClient.email);
       }
-      console.log(error);
       throw new Error("Failed to create client");
     }
+  }
+
+  async getClientByEmail(email: string): Promise<IPartialClient> {
+    const data = await this.clientRepository.getByEmail(email);
+    if (!data) throw new ClientNotFoundException(email);
+    return data;
   }
 }

@@ -1,8 +1,8 @@
-import IWalletModel from "../../../frameworks/prisma/models/wallet.model";
-import { IWalletRepository } from "../wallet.repository";
 import { Wallet } from "../../../core/entities/wallet.entity";
 import { ISanitizedWallet } from "../../../core/interfaces/wallet.interface";
 import WalletMapper from "../../../frameworks/prisma/mappers/wallet.mapper";
+import IWalletModel from "../../../frameworks/prisma/models/wallet.model";
+import { IWalletRepository } from "../wallet.repository";
 
 /*
   Nota: estou usando um mapper nesse repositório para demonstrar que a conversão

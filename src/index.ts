@@ -1,12 +1,12 @@
-import "./util/tracing";
 import figlet from "figlet";
-import ExpressApp from "./frameworks/express";
 import ServicesFactory from "./core/services/factory";
+import ExpressApp from "./frameworks/express";
 import {
   ExpressControllersFactory,
   ExpressMiddlewaresFactory,
-} from "./frameworks/express/modules/client";
+} from "./frameworks/express/modules";
 import { clientRepository, walletRepository } from "./infra/repositories";
+import "./util/tracing";
 
 const app = new ExpressApp();
 
@@ -14,17 +14,31 @@ const servicesFactory = new ServicesFactory(clientRepository, walletRepository);
 const expressControllersFactory = new ExpressControllersFactory(
   servicesFactory,
 );
-const expressMiddlewaresFactory = new ExpressMiddlewaresFactory();
+const expressMiddlewaresFactory = new ExpressMiddlewaresFactory(
+  servicesFactory,
+);
 
 const clientAdapters = expressControllersFactory.createClientController();
 const walletAdapters = expressControllersFactory.createWalletController();
+const authAdapters = expressControllersFactory.createAuthController();
+
+const authenticationMiddleware =
+  expressMiddlewaresFactory.createAuthenticationMiddleware();
 
 app.registerControllers([
+  // Auth Routes
+  {
+    method: "post",
+    path: "auth/login",
+    beforeMiddlewares: [],
+    handler: authAdapters.login,
+    afterMiddlewares: [],
+  },
   // Client Routes
   {
     method: "get",
     path: "clients",
-    beforeMiddlewares: [],
+    beforeMiddlewares: [authenticationMiddleware.execute],
     handler: clientAdapters.getAllClients,
     afterMiddlewares: [],
   },
@@ -32,6 +46,7 @@ app.registerControllers([
     method: "get",
     path: "clients/:clientId",
     beforeMiddlewares: [
+      authenticationMiddleware.execute,
       expressMiddlewaresFactory.createClientIdParamValidationMiddleware()
         .execute,
     ],
@@ -42,6 +57,7 @@ app.registerControllers([
     method: "get",
     path: "clients/:clientId/wallets",
     beforeMiddlewares: [
+      authenticationMiddleware.execute,
       expressMiddlewaresFactory.createClientIdParamValidationMiddleware()
         .execute,
     ],
@@ -52,6 +68,7 @@ app.registerControllers([
     method: "get",
     path: "clients/:clientId/wallets/info",
     beforeMiddlewares: [
+      authenticationMiddleware.execute,
       expressMiddlewaresFactory.createClientIdParamValidationMiddleware()
         .execute,
     ],
@@ -72,6 +89,7 @@ app.registerControllers([
     method: "get",
     path: "wallets/:walletId",
     beforeMiddlewares: [
+      authenticationMiddleware.execute,
       expressMiddlewaresFactory.createWalletIdParamValidationMiddleware()
         .execute,
     ],
@@ -82,6 +100,7 @@ app.registerControllers([
     method: "get",
     path: "wallets/:walletId/info",
     beforeMiddlewares: [
+      authenticationMiddleware.execute,
       expressMiddlewaresFactory.createWalletIdParamValidationMiddleware()
         .execute,
     ],
@@ -92,6 +111,7 @@ app.registerControllers([
     method: "post",
     path: "wallets",
     beforeMiddlewares: [
+      authenticationMiddleware.execute,
       expressMiddlewaresFactory.createWalletBodyValidationMiddleware().execute,
     ],
     handler: walletAdapters.createWallet,

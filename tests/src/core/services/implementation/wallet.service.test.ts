@@ -1,14 +1,17 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import WalletService from "src/core/services/implementation/wallet.service";
-import WalletModel from "src/frameworks/prisma/models/in-memory/wallet.model";
-import uuid from "src/util/uuid";
-import PrismaWalletRepository from "src/infra/repositories/implementation/prisma-wallet.repository";
-import { ForeignKeyError, UniqueConstraintError } from "src/util/exception";
+import WalletService from "../../../../../src/core/services/implementation/wallet.service";
+import WalletModel from "../../../../../src/frameworks/prisma/models/in-memory/wallet.model";
+import uuid from "../../../../../src/util/uuid";
+import PrismaWalletRepository from "../../../../../src/infra/repositories/implementation/prisma-wallet.repository";
+import {
+  ForeignKeyError,
+  UniqueConstraintError,
+} from "../../../../../src/util/exception";
 import {
   InvalidWalletOwnerException,
   WalletAlreadyExistsException,
   WalletNotFoundException,
-} from "src/core/errors/wallet.errors";
+} from "../../../../../src/core/errors/wallet.errors";
 
 describe("Wallet service unit tests", () => {
   let walletRepository = new PrismaWalletRepository(new WalletModel());

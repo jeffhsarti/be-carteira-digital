@@ -1,10 +1,10 @@
 import { Wallet } from "../../../../core/entities/wallet.entity";
 import {
-  ISanitizedWallet,
   IBaseWallet,
+  ISanitizedWallet,
 } from "../../../../core/interfaces/wallet.interface";
-import IWalletController from "../wallet.controller";
 import IWalletService from "../../../../core/services/wallet.service";
+import IWalletController from "../wallet.controller";
 
 export default class WalletController implements IWalletController {
   constructor(private walletService: IWalletService) {}

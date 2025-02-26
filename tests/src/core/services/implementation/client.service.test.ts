@@ -1,17 +1,17 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import ClientService from "src/core/services/implementation/client.service";
-import { IBaseClient } from "src/core/interfaces/client.interface";
-import uuid from "src/util/uuid";
+import ClientService from "../../../../../src/core/services/implementation/client.service";
+import { IBaseClient } from "../../../../../src/core/interfaces/client.interface";
+import uuid from "../../../../../src/util/uuid";
 import {
   ClientAlreadyExistsException,
   ClientNotFoundException,
-} from "src/core/errors/client.errors";
-import WalletService from "src/core/services/implementation/wallet.service";
-import PrismaClientRepository from "src/infra/repositories/implementation/prisma-client.repository";
-import InMemoryClientModel from "src/frameworks/prisma/models/in-memory/client.model";
-import PrismaWalletRepository from "src/infra/repositories/implementation/prisma-wallet.repository";
-import WalletModel from "src/frameworks/prisma/models/in-memory/wallet.model";
-import { UniqueConstraintError } from "src/util/exception";
+} from "../../../../../src/core/errors/client.errors";
+import WalletService from "../../../../../src/core/services/implementation/wallet.service";
+import PrismaClientRepository from "../../../../../src/infra/repositories/implementation/prisma-client.repository";
+import InMemoryClientModel from "../../../../../src/frameworks/prisma/models/in-memory/client.model";
+import PrismaWalletRepository from "../../../../../src/infra/repositories/implementation/prisma-wallet.repository";
+import WalletModel from "../../../../../src/frameworks/prisma/models/in-memory/wallet.model";
+import { UniqueConstraintError } from "../../../../../src/util/exception";
 
 describe("Client service unit tests", () => {
   let clientRepository = new PrismaClientRepository(new InMemoryClientModel());
@@ -59,10 +59,30 @@ describe("Client service unit tests", () => {
     expect(clients.length).toBe(1);
   });
 
-  it("should throw ClientNotFoundException when trying to fetch a client by an inexistent id", async () => {
+  it("should get all clients", async () => {
+    const rawClient: IBaseClient = {
+      name: "John Doe",
+      email: "john.doe@example.com",
+      password: "password123",
+      wallets: [],
+    };
+    await clientService.createClient(rawClient);
+    const client = await clientService.getClientByEmail("john.doe@example.com");
+    expect(client).toBeTruthy();
+    expect(client.id).toBeTruthy();
+    expect(client.email).toBe(rawClient.email);
+    expect(client.name).toBe(rawClient.name);
+    expect(client.password).toBeDefined();
+    expect(typeof client.password).toBe("string");
+  });
+
+  it("should throw ClientNotFoundException when trying to fetch a client by an inexistent id or email", async () => {
     await expect(clientService.getClientById(uuid())).rejects.toThrow(
       ClientNotFoundException,
     );
+    await expect(
+      clientService.getClientByEmail("invalid@email.com"),
+    ).rejects.toThrow(ClientNotFoundException);
   });
 
   it("should throw UniqueConstraintError when trying to create a client with a duplicated email", async () => {
