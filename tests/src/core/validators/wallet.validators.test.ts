@@ -27,14 +27,31 @@ describe("Wallet validators unit tests", () => {
   it("should validate get wallet by id schema", () => {
     const result = getWalletByWalletIdSchema.validate({
       walletId: uuid(),
+      clientId: uuid(),
     });
     expect(result.error).toBeUndefined();
     expect(typeof result.value.walletId).toBe("string");
   });
   it("should fail validation for invalid uuid", () => {
-    const result = getWalletByWalletIdSchema.validate({
+    const result1 = getWalletByWalletIdSchema.validate({
+      walletId: "invalid-uuid",
+      clientId: uuid(),
+    });
+    const result2 = getWalletByWalletIdSchema.validate({
+      walletId: uuid(),
+      clientId: "invalid-uuid",
+    });
+    expect(result1.error).not.toBe(null);
+    expect(result2.error).not.toBe(null);
+  });
+  it("should fail validation for missing data", () => {
+    const result1 = getWalletByWalletIdSchema.validate({
       walletId: "invalid-uuid",
     });
-    expect(result.error).not.toBe(null);
+    const result2 = getWalletByWalletIdSchema.validate({
+      clientId: "invalid-uuid",
+    });
+    expect(result1.error).not.toBe(null);
+    expect(result2.error).not.toBe(null);
   });
 });

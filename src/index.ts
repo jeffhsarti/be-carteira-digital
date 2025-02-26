@@ -1,4 +1,5 @@
 import figlet from "figlet";
+import accessControl from "./config/accesscontrol.config";
 import ServicesFactory from "./core/services/factory";
 import ExpressApp from "./frameworks/express";
 import {
@@ -10,7 +11,11 @@ import "./util/tracing";
 
 const app = new ExpressApp();
 
-const servicesFactory = new ServicesFactory(clientRepository, walletRepository);
+const servicesFactory = new ServicesFactory(
+  clientRepository,
+  walletRepository,
+  accessControl,
+);
 const expressControllersFactory = new ExpressControllersFactory(
   servicesFactory,
 );
@@ -25,6 +30,9 @@ const authAdapters = expressControllersFactory.createAuthController();
 const authenticationMiddleware =
   expressMiddlewaresFactory.createAuthenticationMiddleware();
 
+const authorizationMiddleware =
+  expressMiddlewaresFactory.createAuthorizationMiddleware();
+
 app.registerControllers([
   // Auth Routes
   {
@@ -38,7 +46,10 @@ app.registerControllers([
   {
     method: "get",
     path: "clients",
-    beforeMiddlewares: [authenticationMiddleware.execute],
+    beforeMiddlewares: [
+      authenticationMiddleware.execute,
+      authorizationMiddleware.executeForListClient(false, "readAny", "client"),
+    ],
     handler: clientAdapters.getAllClients,
     afterMiddlewares: [],
   },
@@ -46,9 +57,14 @@ app.registerControllers([
     method: "get",
     path: "clients/:clientId",
     beforeMiddlewares: [
-      authenticationMiddleware.execute,
       expressMiddlewaresFactory.createClientIdParamValidationMiddleware()
         .execute,
+      authenticationMiddleware.execute,
+      authorizationMiddleware.executeForClientIdParam(
+        true,
+        "readAny",
+        "client",
+      ),
     ],
     handler: clientAdapters.getClientById,
     afterMiddlewares: [],
@@ -57,20 +73,22 @@ app.registerControllers([
     method: "get",
     path: "clients/:clientId/wallets",
     beforeMiddlewares: [
-      authenticationMiddleware.execute,
       expressMiddlewaresFactory.createClientIdParamValidationMiddleware()
         .execute,
+      authenticationMiddleware.execute,
+      authorizationMiddleware.executeForListWallet(true, "readOwn", "wallet"),
     ],
     handler: walletAdapters.getWalletsOfClient,
     afterMiddlewares: [],
   },
   {
     method: "get",
-    path: "clients/:clientId/wallets/info",
+    path: "clients/:clientId/list-wallets",
     beforeMiddlewares: [
-      authenticationMiddleware.execute,
       expressMiddlewaresFactory.createClientIdParamValidationMiddleware()
         .execute,
+      authenticationMiddleware.execute,
+      authorizationMiddleware.executeForListWallet(false, "readAny", "wallet"),
     ],
     handler: walletAdapters.getAllWalletsInfoOfClient,
     afterMiddlewares: [],
@@ -84,35 +102,50 @@ app.registerControllers([
     handler: clientAdapters.createClient,
     afterMiddlewares: [],
   },
-  // Wallet Routes
   {
     method: "get",
-    path: "wallets/:walletId",
+    path: "clients/:clientId/wallets/:walletId",
     beforeMiddlewares: [
-      authenticationMiddleware.execute,
       expressMiddlewaresFactory.createWalletIdParamValidationMiddleware()
         .execute,
+      authenticationMiddleware.execute,
+      authorizationMiddleware.executeForWalletIdParam(
+        true,
+        "readOwn",
+        "wallet",
+      ),
     ],
     handler: walletAdapters.getWalletById,
     afterMiddlewares: [],
   },
   {
     method: "get",
-    path: "wallets/:walletId/info",
+    path: "clients/:clientId/wallets/:walletId/info",
     beforeMiddlewares: [
-      authenticationMiddleware.execute,
       expressMiddlewaresFactory.createWalletIdParamValidationMiddleware()
         .execute,
+      authenticationMiddleware.execute,
+      authorizationMiddleware.executeForWalletIdParam(
+        false,
+        "readAny",
+        "wallet",
+      ),
     ],
     handler: walletAdapters.getWalletInfoById,
     afterMiddlewares: [],
   },
   {
     method: "post",
-    path: "wallets",
+    path: "clients/:clientId/wallets",
     beforeMiddlewares: [
+      expressMiddlewaresFactory.createClientIdParamValidationMiddleware()
+        .execute,
       authenticationMiddleware.execute,
-      expressMiddlewaresFactory.createWalletBodyValidationMiddleware().execute,
+      authorizationMiddleware.executeForClientIdParam(
+        true,
+        "createOwn",
+        "wallet",
+      ),
     ],
     handler: walletAdapters.createWallet,
     afterMiddlewares: [],

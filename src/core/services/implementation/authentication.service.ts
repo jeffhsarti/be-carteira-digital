@@ -1,5 +1,5 @@
-import IJWTClientData from "../../../core/interfaces/jwt.interface";
-import IAuthService from "../auth.service";
+import IJWTClientData from "../../interfaces/jwt.interface";
+import IAuthenticationService from "../authentication.service";
 
 import {
   JsonWebTokenError,
@@ -7,16 +7,13 @@ import {
   TokenExpiredError,
   verify,
 } from "jsonwebtoken";
-import { InvalidCredentialsError } from "../../../core/errors/auth.errors";
-import {
-  ExpiredTokenError,
-  InvalidTokenError,
-} from "../../../core/errors/jwt.errors";
-import JWTMapper from "../../../core/mappers/jwt-mapper";
+import { InvalidCredentialsError } from "../../errors/auth.errors";
+import { ExpiredTokenError, InvalidTokenError } from "../../errors/jwt.errors";
+import JWTMapper from "../../mappers/jwt-mapper";
 import { verifyPassword } from "../../../util/crypto";
 import IClientService from "../client.service";
 
-export default class AuthService implements IAuthService {
+export default class AuthenticationService implements IAuthenticationService {
   constructor(private clientService: IClientService) {}
 
   async login(email: string, password: string): Promise<string> {

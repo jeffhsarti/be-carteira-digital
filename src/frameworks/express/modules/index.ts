@@ -18,12 +18,14 @@ import {
   getWalletByWalletIdSchema,
 } from "../../../core/validators/wallet.validators";
 
-import AuthController from "../../../application/http/controllers/implementation/auth.controller";
+import AuthController from "../../../application/http/controllers/implementation/authentication.controller";
 import { AuthenticationMiddleware } from "../../../application/http/middlewares/implementation/authentication.middleware";
+import AuthorizationMiddleware from "../../../application/http/middlewares/implementation/authorization.middleware";
 import ServiceFactory from "../../../core/services/factory";
 import { ValidationException } from "../../../util/exception";
 import { ExpressAuthenticationControllerAdapter } from "./auth/controllers/authentication.controllers";
 import { ExpressAuthenticationMiddleware } from "./auth/middlewares/authentication.middleware";
+import { ExpressAuthorizationMiddleware } from "./auth/middlewares/authorization.middleware";
 
 export class ExpressControllersFactory {
   constructor(private serviceFactory: ServiceFactory) {}
@@ -41,7 +43,7 @@ export class ExpressControllersFactory {
   }
 
   createAuthController() {
-    const authService = this.serviceFactory.createAuthService();
+    const authService = this.serviceFactory.createAuthenticationService();
     const authController = new AuthController(authService);
     return new ExpressAuthenticationControllerAdapter(authController);
   }
@@ -77,8 +79,8 @@ export class ExpressMiddlewaresFactory {
     );
   }
 
-  createWalletBodyValidationMiddleware() {
-    return new ExpressBodyEntityValidationAdapter(
+  createWalletParamValidationMiddleware() {
+    return new ExpressParamsEntityValidationAdapter(
       new ValidationMiddleware(createWalletSchema),
       ValidationException,
     );
@@ -93,7 +95,17 @@ export class ExpressMiddlewaresFactory {
 
   createAuthenticationMiddleware() {
     return new ExpressAuthenticationMiddleware(
-      new AuthenticationMiddleware(this.serviceFactory.createAuthService()),
+      new AuthenticationMiddleware(
+        this.serviceFactory.createAuthenticationService(),
+      ),
+    );
+  }
+
+  createAuthorizationMiddleware() {
+    return new ExpressAuthorizationMiddleware(
+      new AuthorizationMiddleware(
+        this.serviceFactory.createAuthorizationService(),
+      ),
     );
   }
 }

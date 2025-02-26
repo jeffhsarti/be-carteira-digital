@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 
-import IAuthController from "../../../../../application/http/controllers/auth.controller";
+import IAuthController from "../../../../../application/http/controllers/authentication.controller";
 import { InvalidCredentialsError } from "../../../../../core/errors/auth.errors";
 import { ClientNotFoundException } from "../../../../../core/errors/client.errors";
 import logger from "../../../../../util/logger";

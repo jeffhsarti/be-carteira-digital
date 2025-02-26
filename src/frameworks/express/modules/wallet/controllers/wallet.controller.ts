@@ -16,8 +16,8 @@ export class ExpressWalletControllerAdapter {
 
   createWallet = async (req: Request, res: Response) => {
     try {
-      const walletData = req.body;
-      const wallet = await this.walletController.createWallet(walletData);
+      const { clientId } = req.params;
+      const wallet = await this.walletController.createWallet({ clientId });
       return res.status(201).json(wallet);
     } catch (error) {
       return handleError(error, res);

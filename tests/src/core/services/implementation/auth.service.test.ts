@@ -3,7 +3,7 @@ import ClientService from "../../../../../src/core/services/implementation/clien
 import PrismaClientRepository from "../../../../../src/infra/repositories/implementation/prisma-client.repository";
 import InMemoryClientModel from "../../../../../src/frameworks/prisma/models/in-memory/client.model";
 import WalletService from "../../../../../src/core/services/implementation/wallet.service";
-import AuthService from "../../../../../src/core/services/implementation/auth.service";
+import AuthenticationService from "../../../../../src/core/services/implementation/authentication.service";
 import WalletModel from "../../../../../src/frameworks/prisma/models/in-memory/wallet.model";
 import PrismaWalletRepository from "../../../../../src/infra/repositories/implementation/prisma-wallet.repository";
 import { IBaseClient } from "../../../../../src/core/interfaces/client.interface";
@@ -21,7 +21,7 @@ describe("Auth service unit tests", () => {
     clientRepository,
     new WalletService(walletRepository),
   );
-  let authService = new AuthService(clientService);
+  let authService = new AuthenticationService(clientService);
 
   beforeAll(() => {
     vi.stubEnv("JWT_SECRET", "test");
