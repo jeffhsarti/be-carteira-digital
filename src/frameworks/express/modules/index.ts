@@ -1,25 +1,31 @@
-import { ValidationMiddleware } from "../../../../application/http/middlewares/implementation/entity-validation.middleware";
-import { ExpressClientControllerAdapter } from "./controllers/client.controller";
-import { ExpressWalletControllerAdapter } from "./controllers/wallet.controller";
+import { ValidationMiddleware } from "../../../application/http/middlewares/implementation/entity-validation.middleware";
+import { ExpressClientControllerAdapter } from "./client/controllers/client.controller";
+import { ExpressWalletControllerAdapter } from "./wallet/controllers/wallet.controller";
 
 import {
   ExpressBodyEntityValidationAdapter,
   ExpressParamsEntityValidationAdapter,
-} from "../middlewares/entity-validation.middleware";
+} from "./middlewares/entity-validation.middleware";
 
-import ClientController from "../../../../application/http/controllers/implementation/client.controller";
-import WalletController from "../../../../application/http/controllers/implementation/wallet.controller";
+import ClientController from "../../../application/http/controllers/implementation/client.controller";
+import WalletController from "../../../application/http/controllers/implementation/wallet.controller";
 import {
   createClientSchema,
   getClientByIdSchema,
-} from "../../../../core/validators/client.validators";
+} from "../../../core/validators/client.validators";
 import {
   createWalletSchema,
   getWalletByWalletIdSchema,
-} from "../../../../core/validators/wallet.validators";
+} from "../../../core/validators/wallet.validators";
 
-import { ValidationException } from "../../../../util/exception";
-import ServiceFactory from "../../../../core/services/factory";
+import AuthController from "../../../application/http/controllers/implementation/authentication.controller";
+import { AuthenticationMiddleware } from "../../../application/http/middlewares/implementation/authentication.middleware";
+import AuthorizationMiddleware from "../../../application/http/middlewares/implementation/authorization.middleware";
+import ServiceFactory from "../../../core/services/factory";
+import { ValidationException } from "../../../util/exception";
+import { ExpressAuthenticationControllerAdapter } from "./auth/controllers/authentication.controllers";
+import { ExpressAuthenticationMiddleware } from "./auth/middlewares/authentication.middleware";
+import { ExpressAuthorizationMiddleware } from "./auth/middlewares/authorization.middleware";
 
 export class ExpressControllersFactory {
   constructor(private serviceFactory: ServiceFactory) {}
@@ -35,9 +41,17 @@ export class ExpressControllersFactory {
     const walletController = new WalletController(walletService);
     return new ExpressWalletControllerAdapter(walletController);
   }
+
+  createAuthController() {
+    const authService = this.serviceFactory.createAuthenticationService();
+    const authController = new AuthController(authService);
+    return new ExpressAuthenticationControllerAdapter(authController);
+  }
 }
 
 export class ExpressMiddlewaresFactory {
+  constructor(private serviceFactory: ServiceFactory) {}
+
   /*
     Vide o hack em middlewares/entity-validation.middleware.ts
     Esse hack permite que eu passe qualquer objeto que implemente a 
@@ -65,8 +79,8 @@ export class ExpressMiddlewaresFactory {
     );
   }
 
-  createWalletBodyValidationMiddleware() {
-    return new ExpressBodyEntityValidationAdapter(
+  createWalletParamValidationMiddleware() {
+    return new ExpressParamsEntityValidationAdapter(
       new ValidationMiddleware(createWalletSchema),
       ValidationException,
     );
@@ -76,6 +90,22 @@ export class ExpressMiddlewaresFactory {
     return new ExpressParamsEntityValidationAdapter(
       new ValidationMiddleware(getWalletByWalletIdSchema),
       ValidationException,
+    );
+  }
+
+  createAuthenticationMiddleware() {
+    return new ExpressAuthenticationMiddleware(
+      new AuthenticationMiddleware(
+        this.serviceFactory.createAuthenticationService(),
+      ),
+    );
+  }
+
+  createAuthorizationMiddleware() {
+    return new ExpressAuthorizationMiddleware(
+      new AuthorizationMiddleware(
+        this.serviceFactory.createAuthorizationService(),
+      ),
     );
   }
 }

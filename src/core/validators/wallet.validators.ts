@@ -5,5 +5,6 @@ export const createWalletSchema = Joi.object({
 });
 
 export const getWalletByWalletIdSchema = Joi.object({
+  clientId: Joi.string().uuid({ version: "uuidv4" }).required(),
   walletId: Joi.string().uuid({ version: "uuidv4" }).required(),
 });

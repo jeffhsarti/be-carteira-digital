@@ -11,6 +11,12 @@ export default class ClientModel implements IClientModel {
     });
   }
 
+  async findByEmail(email: string): Promise<Client | null> {
+    return this.prisma.client.findUnique({
+      where: { email },
+    });
+  }
+
   async findAll(): Promise<Client[]> {
     return this.prisma.client.findMany();
   }

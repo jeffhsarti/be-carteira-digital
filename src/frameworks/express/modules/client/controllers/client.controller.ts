@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import {
-  ClientNotFoundException,
   ClientAlreadyExistsException,
+  ClientNotFoundException,
 } from "../../../../../core/errors/client.errors";
 
 import IClientController from "../../../../../application/http/controllers/client.controller";
@@ -44,7 +44,7 @@ export class ExpressClientControllerAdapter {
 }
 
 function handleError(error: any, res: Response) {
-  logger.error("Error:", error.message);
+  logger.error("ExpressClientControllerAdapterError:", error.message);
   if (error instanceof ClientNotFoundException) {
     return res.status(404).json({ message: error.message });
   } else if (error instanceof ClientAlreadyExistsException) {

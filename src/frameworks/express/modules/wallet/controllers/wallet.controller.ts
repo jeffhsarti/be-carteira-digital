@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
 import {
   InvalidWalletOwnerException,
-  WalletNotFoundException,
   WalletAlreadyExistsException,
+  WalletNotFoundException,
 } from "../../../../../core/errors/wallet.errors";
 
 import IWalletController from "../../../../../application/http/controllers/wallet.controller";
@@ -16,8 +16,8 @@ export class ExpressWalletControllerAdapter {
 
   createWallet = async (req: Request, res: Response) => {
     try {
-      const walletData = req.body;
-      const wallet = await this.walletController.createWallet(walletData);
+      const { clientId } = req.params;
+      const wallet = await this.walletController.createWallet({ clientId });
       return res.status(201).json(wallet);
     } catch (error) {
       return handleError(error, res);
@@ -65,7 +65,7 @@ export class ExpressWalletControllerAdapter {
 }
 
 function handleError(error: any, res: Response) {
-  logger.error("Error:", error.message);
+  logger.error("ExpressWalletControllerAdapter:", error.message);
   if (error instanceof WalletNotFoundException) {
     return res.status(404).json({ message: error.message });
   } else if (

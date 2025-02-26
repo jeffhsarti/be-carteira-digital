@@ -1,8 +1,8 @@
+import { Wallet } from "../../../core/entities/wallet.entity";
 import {
   IBaseWallet,
   ISanitizedWallet,
 } from "../../../core/interfaces/wallet.interface";
-import { Wallet } from "../../../core/entities/wallet.entity";
 
 export default interface IWalletController {
   getWalletById(id: string): Promise<Wallet>;

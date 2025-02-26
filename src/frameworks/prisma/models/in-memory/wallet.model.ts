@@ -1,7 +1,7 @@
 import { Wallet } from "@prisma/client";
+import { Decimal } from "@prisma/client/runtime/library";
 import { Wallet as WalletEntity } from "../../../../core/entities/wallet.entity";
 import IWalletModel from "../wallet.model";
-import { Decimal } from "@prisma/client/runtime/library";
 
 export default class WalletModel implements IWalletModel {
   wallets: Wallet[] = [];

@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import Joi from "joi";
 import IValidationMiddleware from "../../../../application/http/middlewares/entity-validation.middleware";
 import { InvalidEntityException } from "../../../../util/exception";
+import logger from "../../../../util/logger";
 import { MiddlewareAdapter } from "../../types";
 
 export class ExpressBodyEntityValidationAdapter implements MiddlewareAdapter {
@@ -23,6 +24,9 @@ export class ExpressBodyEntityValidationAdapter implements MiddlewareAdapter {
       }
       return next();
     } catch (error) {
+      if (error instanceof Error) {
+        logger.error("ExpressBodyEntityValidationAdapter: " + error.message);
+      }
       if (error instanceof this.ExceptionType) {
         return res.status(400).json({
           error: "Dados inválidos.",
@@ -51,6 +55,9 @@ export class ExpressParamsEntityValidationAdapter implements MiddlewareAdapter {
       }
       return next();
     } catch (error) {
+      if (error instanceof Error) {
+        logger.error("ExpressParamsEntityValidationAdapter: " + error.message);
+      }
       if (error instanceof this.ExceptionType) {
         return res.status(400).json({
           error: "Parâmetros inválidos.",

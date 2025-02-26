@@ -1,4 +1,4 @@
-import { Wallet, PrismaClient } from "@prisma/client";
+import { PrismaClient, Wallet } from "@prisma/client";
 import { Wallet as WalletEntity } from "../../../../core/entities/wallet.entity";
 import IWalletModel from "../wallet.model";
 

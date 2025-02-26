@@ -1,8 +1,8 @@
 import { Prisma } from "@prisma/client";
 import {
-  UniqueConstraintError,
   ForeignKeyError,
   ObjectNotFoundError,
+  UniqueConstraintError,
 } from "../../../util/exception";
 
 export function handleException(error: Prisma.PrismaClientKnownRequestError) {

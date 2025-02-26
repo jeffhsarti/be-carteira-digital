@@ -22,3 +22,10 @@ export interface ISanitizedClient {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export interface IPartialClient {
+  id: string;
+  name: string;
+  email: string;
+  password: string;
+}
